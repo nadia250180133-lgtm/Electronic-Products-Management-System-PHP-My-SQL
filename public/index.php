@@ -1,108 +1,140 @@
 <?php
-// public/index.php
 require_once '../config/db.php';
 
-// Query Ringkasan Statistik
-$statStmt = $pdo->query("SELECT 
-    COUNT(*) AS total_produk, 
-    IFNULL(SUM(stok), 0) AS total_stok, 
-    IFNULL(SUM(stok * harga), 0) AS nilai_total_stok 
-FROM products");
+// Ambil Statistik Produk
+$statStmt = $pdo->query("SELECT COUNT(*) AS total_items, SUM(stok) AS total_stock, SUM(stok * harga) AS total_value FROM products");
 $stats = $statStmt->fetch();
 
-// Pendapatan Penjualan (Default Rp 0 jika belum ada tabel transaksi)
-$pendapatan_penjualan = 0; 
+$totalItems = $stats['total_items'] ?? 0;
+$totalStock = $stats['total_stock'] ?? 0;
+$totalValue = $stats['total_value'] ?? 0;
 
-// Query Ambil Semua Data Produk
-$stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC");
+// Ambil Total Pendapatan Penjualan dari Tabel Sales
+try {
+    $salesStmt = $pdo->query("SELECT SUM(total_price) AS total_revenue FROM sales");
+    $salesData = $salesStmt->fetch();
+    $totalRevenue = $salesData['total_revenue'] ?? 0;
+} catch (PDOException $e) {
+    // Jika tabel sales belum dibuat, default ke 0
+    $totalRevenue = 0;
+}
+
+// Ambil Daftar Produk
+$stmt = $pdo->query("SELECT * FROM products ORDER BY created_at DESC");
 $products = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penjualan Produk - Dashboard</title>
+    <title>Sistem Manajemen Produk Elektronik</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
-<body style="background-color: #a3b8cc;"> <!-- Warna Latar Belakang disesuaikan -->
-    <div class="container" style="max-width: 1200px; margin: 20px auto;">
-        
-        <!-- Header Banner -->
-        <div class="header-box">
-            <div class="header-title">
-                <h1>Electronic Products</h1>
-                <p>Electronic Products Management System</p>
-            </div>
-            <div class="date-badge">
-                <?= date('d M Y'); ?>
-            </div>
-        </div>
+<body>
+    <div class="container">
+        <h1>Sistem Manajemen Produk Elektronik</h1>
 
-        <!-- Dashboard Ringkasan Statistik -->
+        <!-- Flash Message Notification -->
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success">
+                <?= htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-error">
+                <?= htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Dashboard Widgets -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Produk</div>
-                <div class="stat-value"><?= $stats['total_produk']; ?></div>
+                <p class="stat-label">Total Jenis Produk</p>
+                <p class="stat-value"><?= number_format($totalItems, 0, ',', '.'); ?></p>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Stok</div>
-                <div class="stat-value"><?= $stats['total_stok']; ?> unit</div>
+                <p class="stat-label">Total Unit Stok</p>
+                <p class="stat-value"><?= number_format($totalStock, 0, ',', '.'); ?></p>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Nilai Total Stok</div>
-                <div class="stat-value">Rp <?= number_format($stats['nilai_total_stok'], 0, ',', '.'); ?></div>
+                <p class="stat-label">Total Nilai Stok</p>
+                <p class="stat-value">Rp <?= number_format($totalValue, 0, ',', '.'); ?></p>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pendapatan Penjualan</div>
-                <div class="stat-value">Rp <?= number_format($pendapatan_penjualan, 0, ',', '.'); ?></div>
+                <p class="stat-label">Pendapatan Penjualan</p>
+                <p class="stat-value">Rp <?= number_format($totalRevenue, 0, ',', '.'); ?></p>
             </div>
         </div>
 
-        <!-- Tombol Tambah & Alert Flash Message -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: #ffffff;">Daftar Produk</h2>
-            <a href="create.php" class="btn btn-primary">+ Tambah Produk</a>
+        <!-- Action Header -->
+        <div style="margin-bottom: 20px;">
+            <a href="create.php" class="btn btn-primary">+ Tambah Produk Baru</a>
         </div>
 
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
-
-        <!-- List Products (Card Layout) -->
-        <?php if (empty($products)): ?>
-            <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; color: #64748b;">
-                Belum ada produk elektronik yang tersedia.
-            </div>
-        <?php else: ?>
-            <div class="grid">
-                <?php foreach ($products as $p): ?>
-                    <div class="card">
-                        <div>
-                            <span class="card-tag"><?= htmlspecialchars($p['kategori']); ?></span>
-                            <h2 class="card-title"><?= htmlspecialchars($p['nama']); ?></h2>
-                            <div class="card-price">Rp <?= number_format($p['harga'], 0, ',', '.'); ?></div>
-                            <div class="card-stock">Sisa Stok: <strong><?= $p['stok']; ?></strong> unit</div>
+        <!-- Product Cards Grid -->
+        <div class="product-grid">
+            <?php if (empty($products)): ?>
+                <p style="grid-column: 1/-1; text-align: center; color: #666;">Belum ada data produk.</p>
+            <?php else: ?>
+                <?php foreach ($products as $product): ?>
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3><?= htmlspecialchars($product['nama']); ?></h3>
+                            <span class="badge"><?= htmlspecialchars($product['kategori']); ?></span>
                         </div>
-                        <div class="card-actions">
-                            <a href="edit.php?id=<?= $p['id']; ?>" class="btn btn-secondary" style="flex:1; text-align:center;">Edit</a>
+                        <div class="product-body">
+                            <p><strong>Harga:</strong> Rp <?= number_format($product['harga'], 0, ',', '.'); ?></p>
+                            <p><strong>Stok:</strong> <?= number_format($product['stok'], 0, ',', '.'); ?> unit</p>
+                        </div>
+                        
+                        <!-- Form Beli / Transaksi Penjualan -->
+                        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+                            <?php if ($product['stok'] > 0): ?>
+                                <form action="buy.php" method="POST" style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                    <input type="hidden" name="id" value="<?= $product['id']; ?>">
+                                    
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <label for="qty-<?= $product['id']; ?>" style="font-size: 0.85rem; color: #555;">Qty:</label>
+                                        <input type="number" 
+                                               id="qty-<?= $product['id']; ?>"
+                                               name="quantity" 
+                                               value="1" 
+                                               min="1" 
+                                               max="<?= $product['stok']; ?>" 
+                                               style="width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" 
+                                               required>
+                                    </div>
+                                    
+                                    <button type="submit" 
+                                            style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;"
+                                            onclick="return confirm('Konfirmasi pembelian produk ini?')">
+                                        🛒 Beli
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block;">
+                                    Stok Habis
+                                </span>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Edit & Delete Actions -->
+                        <div class="product-actions" style="margin-top: 10px; display: flex; gap: 8px;">
+                            <a href="edit.php?id=<?= $product['id']; ?>" class="btn btn-warning" style="flex: 1; text-align: center;">Edit</a>
                             
-                            <!-- Delete via POST + CSRF Protection -->
-                            <form action="delete.php" method="POST" style="flex:1;" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                                <input type="hidden" name="id" value="<?= $p['id']; ?>">
+                            <form action="delete.php" method="POST" style="flex: 1;" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                <button type="submit" class="btn btn-danger" style="width:100%;">Hapus</button>
+                                <input type="hidden" name="id" value="<?= $product['id']; ?>">
+                                <button type="submit" class="btn btn-danger" style="width: 100%;">Hapus</button>
                             </form>
                         </div>
                     </div>
                 <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-
+            <?php endif; ?>
+        </div>
     </div>
 </body>
 </html>

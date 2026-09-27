@@ -1,1 +1,32 @@
 # Biarkan kosong atau isi jika ada file yang tidak ingin diupload
+<div class="product-actions" style="margin-top: 15px; border-top: 1px solid #eee; pt-2;">
+    <?php if ($product['stok'] > 0): ?>
+        <!-- Form Beli Produk -->
+        <form action="buy.php" method="POST" style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+            <input type="hidden" name="id" value="<?= $product['id']; ?>">
+            
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <label for="qty-<?= $product['id']; ?>" style="font-size: 0.85rem; color: #555;">Qty:</label>
+                <input type="number" 
+                       id="qty-<?= $product['id']; ?>"
+                       name="quantity" 
+                       value="1" 
+                       min="1" 
+                       max="<?= $product['stok']; ?>" 
+                       style="width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" 
+                       required>
+            </div>
+            
+            <button type="submit" 
+                    style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;"
+                    onclick="return confirm('Konfirmasi pembelian produk ini?')">
+                🛒 Beli
+            </button>
+        </form>
+    <?php else: ?>
+        <span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block;">
+            Stok Habis
+        </span>
+    <?php endif; ?>
+</div>
