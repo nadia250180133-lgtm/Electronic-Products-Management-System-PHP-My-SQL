@@ -15,27 +15,35 @@ try {
     $salesData = $salesStmt->fetch();
     $totalRevenue = $salesData['total_revenue'] ?? 0;
 } catch (PDOException $e) {
-    // Jika tabel sales belum dibuat, default ke 0
     $totalRevenue = 0;
 }
 
-// Ambil Daftar Produk
-$stmt = $pdo->query("SELECT * FROM products ORDER BY created_at DESC");
-$products = $stmt->fetchAll();
+// Ambil Data Produk
+$products = $pdo->query("SELECT * FROM products ORDER BY id ASC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Manajemen Produk Elektronik</title>
+    <title>Penjualan Produk - Sistem Informasi Data Produk</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Sistem Manajemen Produk Elektronik</h1>
+    <div class="main-container">
+        
+        <!-- Header Utama -->
+        <div class="header-card">
+            <div>
+                <h1 class="header-title">Electronic Products</h1>
+                <p class="header-subtitle">Electronic Products Management System</p>
+            </div>
+            <div class="date-badge">
+                <?= date('d M Y'); ?>
+            </div>
+        </div>
 
-        <!-- Flash Message Notification -->
+        <!-- Flash Messages -->
         <?php if (isset($_SESSION['flash_success'])): ?>
             <div class="alert alert-success">
                 <?= htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
@@ -48,93 +56,96 @@ $products = $stmt->fetchAll();
             </div>
         <?php endif; ?>
 
-        <!-- Dashboard Widgets -->
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <p class="stat-label">Total Jenis Produk</p>
-                <p class="stat-value"><?= number_format($totalItems, 0, ',', '.'); ?></p>
+                <span class="stat-label">Total Produk</span>
+                <div class="stat-value"><?= number_format($totalItems, 0, ',', '.'); ?></div>
             </div>
             <div class="stat-card">
-                <p class="stat-label">Total Unit Stok</p>
-                <p class="stat-value"><?= number_format($totalStock, 0, ',', '.'); ?></p>
+                <span class="stat-label">Total Stok</span>
+                <div class="stat-value"><?= number_format($totalStock, 0, ',', '.'); ?> <span class="unit-text">unit</span></div>
             </div>
             <div class="stat-card">
-                <p class="stat-label">Total Nilai Stok</p>
-                <p class="stat-value">Rp <?= number_format($totalValue, 0, ',', '.'); ?></p>
+                <span class="stat-label">Nilai Total Stok</span>
+                <div class="stat-value">Rp <?= number_format($totalValue, 0, ',', '.'); ?></div>
             </div>
             <div class="stat-card">
-                <p class="stat-label">Pendapatan Penjualan</p>
-                <p class="stat-value">Rp <?= number_format($totalRevenue, 0, ',', '.'); ?></p>
+                <span class="stat-label">Pendapatan Penjualan</span>
+                <div class="stat-value">Rp <?= number_format($totalRevenue, 0, ',', '.'); ?></div>
             </div>
         </div>
 
-        <!-- Action Header -->
-        <div style="margin-bottom: 20px;">
-            <a href="create.php" class="btn btn-primary">+ Tambah Produk Baru</a>
-        </div>
+        <!-- Section Tabel Produk -->
+        <div class="table-container-card">
+            <div class="table-header-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Daftar Produk</h2>
+                    <p>Informasi produk dan pengelolaan stok</p>
+                </div>
+                <a href="create.php" class="btn-tambah-produk">+ Tambah Produk</a>
+            </div>
 
-        <!-- Product Cards Grid -->
-        <div class="product-grid">
-            <?php if (empty($products)): ?>
-                <p style="grid-column: 1/-1; text-align: center; color: #666;">Belum ada data produk.</p>
-            <?php else: ?>
-                <?php foreach ($products as $product): ?>
-                    <div class="product-card">
-                        <div class="product-header">
-                            <h3><?= htmlspecialchars($product['nama']); ?></h3>
-                            <span class="badge"><?= htmlspecialchars($product['kategori']); ?></span>
-                        </div>
-                        <div class="product-body">
-                            <p><strong>Harga:</strong> Rp <?= number_format($product['harga'], 0, ',', '.'); ?></p>
-                            <p><strong>Stok:</strong> <?= number_format($product['stok'], 0, ',', '.'); ?> unit</p>
-                        </div>
-                        
-                        <!-- Form Beli / Transaksi Penjualan -->
-                        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-                            <?php if ($product['stok'] > 0): ?>
-                                <form action="buy.php" method="POST" style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
-                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                    <input type="hidden" name="id" value="<?= $product['id']; ?>">
-                                    
-                                    <div style="display: flex; align-items: center; gap: 5px;">
-                                        <label for="qty-<?= $product['id']; ?>" style="font-size: 0.85rem; color: #555;">Qty:</label>
-                                        <input type="number" 
-                                               id="qty-<?= $product['id']; ?>"
-                                               name="quantity" 
-                                               value="1" 
-                                               min="1" 
-                                               max="<?= $product['stok']; ?>" 
-                                               style="width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" 
-                                               required>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>PRODUK</th>
+                        <th>KATEGORI</th>
+                        <th>HARGA</th>
+                        <th>STOK</th>
+                        <th>KELOLA</th>
+                        <th style="text-align: center;">PENJUALAN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($products)): ?>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: #888;">Belum ada data produk.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($products as $product): ?>
+                            <?php 
+                                $stok = $product['stok'];
+                                $deskripsi = !empty($product['deskripsi']) ? $product['deskripsi'] : 'Informasi produk dan pengelolaan stok.';
+                            ?>
+                            <tr>
+                                <td class="text-id">#<?= $product['id']; ?></td>
+                                <td>
+                                    <div class="product-info-cell">
+                                        <div class="product-box-icon">📦</div>
+                                        <div>
+                                            <div class="product-name-title"><?= htmlspecialchars($product['nama']); ?></div>
+                                            <div class="product-desc-text"><?= htmlspecialchars($deskripsi); ?></div>
+                                        </div>
                                     </div>
-                                    
-                                    <button type="submit" 
-                                            style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;"
-                                            onclick="return confirm('Konfirmasi pembelian produk ini?')">
-                                        🛒 Beli
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block;">
-                                    Stok Habis
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Edit & Delete Actions -->
-                        <div class="product-actions" style="margin-top: 10px; display: flex; gap: 8px;">
-                            <a href="edit.php?id=<?= $product['id']; ?>" class="btn btn-warning" style="flex: 1; text-align: center;">Edit</a>
-                            
-                            <form action="delete.php" method="POST" style="flex: 1;" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                <input type="hidden" name="id" value="<?= $product['id']; ?>">
-                                <button type="submit" class="btn btn-danger" style="width: 100%;">Hapus</button>
-                            </form>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="category-badge"><?= htmlspecialchars($product['kategori']); ?></span>
+                                </td>
+                                <td class="price-text">Rp <?= number_format($product['harga'], 0, ',', '.'); ?></td>
+                                <td class="stock-text"><strong><?= $stok; ?></strong> <span class="unit-text">unit</span></td>
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <a href="edit.php?id=<?= $product['id']; ?>" class="btn-edit-action">Edit</a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form action="buy.php" method="POST" class="action-buttons-form">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                        <input type="hidden" name="id" value="<?= $product['id']; ?>">
+                                        
+                                        <input type="number" name="quantity" value="1" min="1" max="<?= $stok; ?>" style="width: 45px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center;" required>
+                                        <button type="submit" class="btn-jual" <?= ($stok <= 0) ? 'disabled' : ''; ?>>Jual</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
+
     </div>
 </body>
 </html>

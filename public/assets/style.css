@@ -1,104 +1,287 @@
-:root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --bg: #f8fafc;
-  --card-bg: #ffffff;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --danger: #ef4444;
-  --success: #10b981;
-  --border: #e2e8f0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body { background-color: var(--bg); color: var(--text); padding: 20px; }
+body {
+    background-color: #a3b8cc; /* Background abu-biru luar */
+    padding: 20px;
+    color: #334155;
+}
 
-.container { max-width: 1100px; margin: 0 auto; }
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--border); }
+.main-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-h1 { font-size: 1.8rem; color: var(--primary); }
-
-.btn { display: inline-block; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; transition: background 0.2s; }
-.btn-primary { background: var(--primary); color: white; }
-.btn-primary:hover { background: var(--primary-hover); }
-.btn-danger { background: var(--danger); color: white; }
-.btn-secondary { background: var(--text-muted); color: white; }
-
-.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; }
-.alert-success { background: #d1fae5; color: #065f46; }
-.alert-danger { background: #fee2e2; color: #991b1b; }
-
-/* Grid Card */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
-.card-tag { font-size: 0.75rem; background: #e0e7ff; color: #3730a3; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 700; width: fit-content; margin-bottom: 10px; }
-.card-title { font-size: 1.2rem; margin-bottom: 8px; }
-.card-price { font-size: 1.3rem; font-weight: bold; color: var(--primary); margin-bottom: 5px; }
-.card-stock { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
-
-.card-actions { display: flex; gap: 8px; margin-top: 10px; }
-.card-actions form { display: inline; }
-
-/* Form Style */
-.form-card { background: white; padding: 25px; border-radius: 10px; border: 1px solid var(--border); max-width: 500px; margin: 0 auto; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; }
-
-/* Styling Header & Stat Cards sesuai Desain Gambar */
-.header-box {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px 25px;
+/* Header Card */
+.header-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
-.header-title h1 {
-    color: #1e3a8a;
+.header-title {
     font-size: 1.8rem;
-    margin-bottom: 4px;
+    font-weight: 700;
+    color: #1e3a8a; /* Biru Tua */
 }
 
-.header-title p {
+.header-subtitle {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    margin-top: 2px;
 }
 
 .date-badge {
-    background: #f1f5f9;
+    background-color: #f1f5f9;
     color: #64748b;
     padding: 8px 16px;
     border-radius: 8px;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
+/* Flash Notification */
+.alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.alert-success { background-color: #d1fae5; color: #065f46; }
+.alert-error { background-color: #fee2e2; color: #991b1b; }
+
+/* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    margin-bottom: 25px;
 }
 
 .stat-card {
-    background: #ffffff;
+    background-color: #ffffff;
     border-radius: 12px;
-    padding: 18px 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    padding: 20px 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 
-.stat-card .stat-label {
-    font-size: 0.85rem;
+.stat-label {
+    display: block;
     color: #64748b;
+    font-size: 0.85rem;
     margin-bottom: 8px;
 }
 
-.stat-card .stat-value {
-    font-size: 1.35rem;
+.stat-value {
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1e3a8a;
+}
+
+.unit-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #64748b;
+}
+
+/* Table Card Container */
+.table-container-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.table-header-title {
+    margin-bottom: 20px;
+}
+
+.table-header-title h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.table-header-title p {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* Custom Table */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.custom-table th {
+    text-align: left;
+    padding: 12px 14px;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-table td {
+    padding: 14px;
+    vertical-align: middle;
+}
+
+/* Baris Warna Dinamis berdasarkan Status */
+.row-aman { background-color: #ffffff; }
+.row-menipis { background-color: #fffbeb; }
+.row-kritis { background-color: #fef2f2; }
+
+/* Cell Content Styles */
+.text-id {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.product-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-box-icon {
+    width: 36px;
+    height: 36px;
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.product-name-title {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.9rem;
+}
+
+.product-desc-text {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.category-badge {
+    background-color: #e0e7ff;
+    color: #4338ca;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.price-text {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.stock-text {
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-aman { background-color: #d1fae5; color: #059669; }
+.status-menipis { background-color: #fef3c7; color: #d97706; }
+.status-kritis { background-color: #fee2e2; color: #dc2626; }
+
+.sold-badge {
+    background-color: #f1f5f9;
+    color: #334155;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Action Buttons Form */
+.action-buttons-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-qty {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-minus { background-color: #fee2e2; color: #ef4444; }
+.btn-plus { background-color: #d1fae5; color: #10b981; }
+
+.btn-jual {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-jual:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+/* Tombol Tambah Produk */
+.btn-tambah-produk {
+    background-color: #10b981;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+}
+.btn-tambah-produk:hover {
+    background-color: #059669;
+}
+
+/* Tombol Edit Action */
+.btn-edit-action {
+    background-color: #f59e0b;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+.btn-edit-action:hover {
+    background-color: #d97706;
 }
